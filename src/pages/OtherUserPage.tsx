@@ -3,7 +3,7 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import PostsList from '../components/PostsList';
 import NewPost from '../components/NewPost';
 import { UserContext } from '../components/UserContext';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { isEmptyObject } from '../utils/helperfunctions';
 
@@ -194,15 +194,37 @@ function OtherUserPage() {
           <>
             {searchedUserId && <NewPost profUID={searchedUserId} />}
             {searchedUserId && <PostsList id={searchedUserId} />}
-            {!isFriend && (<button onClick={() => handleRequestFriend()}>Send Request</button>)}
-            {isFriend && (<button onClick={() => handleRemoveFriend()}>Remove Friend</button>)}
-            {/* {!isBlocked && (<button onClick={() => handleBlockUser()}>Block User</button>)}
-            {isBlocked && (<button onClick={() => handleUnblockUser()}>Unblock User</button>)} */}      
+            
+            {!isFriend && (
+              <TouchableOpacity onPress={() => handleRequestFriend()}>
+                <Text>Send Request</Text>
+              </TouchableOpacity>
+            )}
+            
+            {isFriend && (
+              <TouchableOpacity onPress={() => handleRemoveFriend()}>
+                <Text>Remove Friend</Text>
+              </TouchableOpacity>
+            )}
+  
+            {/* Optional: If you want to add Block/Unblock functionality */}
+            {/* 
+            {!isBlocked && (
+              <TouchableOpacity onPress={() => handleBlockUser()} style={styles.button}>
+                <Text style={styles.buttonText}>Block User</Text>
+              </TouchableOpacity>
+            )}
+            {isBlocked && (
+              <TouchableOpacity onPress={() => handleUnblockUser()} style={styles.button}>
+                <Text style={styles.buttonText}>Unblock User</Text>
+              </TouchableOpacity>
+            )}
+            */}      
           </>
         )}
       </View>
     </>
-  )
+  );
 }
 
 export default OtherUserPage;
