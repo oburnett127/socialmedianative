@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
-import { RootDrawerParamList } from '../App';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootDrawerParamList, RootStackParamList } from '../App'; // Ensure RootStackParamList is defined and exported
 
 interface IUser {
   id: number;
@@ -12,11 +13,16 @@ interface IUser {
   lastName: string;
 }
 
-type SearchUserNavigationProp = DrawerNavigationProp<RootDrawerParamList, 'SearchUser'>;
+// Define the combined navigation prop type
+type SearchUserNavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<RootDrawerParamList, 'SearchUser'>,
+  StackNavigationProp<RootStackParamList>
+>;
 
 function SearchUser() {
+  // Update navigation hook to use the composite navigation type
   const navigation = useNavigation<SearchUserNavigationProp>();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [data, setData] = useState<IUser[] | null>(null);
   const [error, setError] = useState<string | null>(null);

@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, Button, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import axios from 'axios';
 import { UserContext } from './UserContext';
-import { RootDrawerParamList } from '../App';
-import { DrawerNavigationProp } from '@react-navigation/drawer';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, CompositeNavigationProp } from '@react-navigation/native';
+import { DrawerNavigationProp } from '@react-navigation/drawer';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { isEmptyObject } from '../utils/helperfunctions';
+import { RootDrawerParamList } from '../App'; // Assuming this is defined for drawer
+import { RootStackParamList } from '../App';
 
 interface Friend {
   id: number;
@@ -14,7 +16,10 @@ interface Friend {
   lastName: string;
 }
 
-type FriendsListNavigationProp = DrawerNavigationProp<RootDrawerParamList, 'FriendsList'>;
+type FriendsListNavigationProp = CompositeNavigationProp<
+  DrawerNavigationProp<RootDrawerParamList, 'FriendsList'>,
+  StackNavigationProp<RootStackParamList>
+>;
 
 const FriendsList: React.FC = () => {
   const userContext = useContext(UserContext);
@@ -29,11 +34,11 @@ const FriendsList: React.FC = () => {
       try {
         const jwtToken = await AsyncStorage.getItem('jwtToken');
         
-        if(userContext) {
+        if (userContext) {
           const { user } = userContext;
        
           if (isEmptyObject(user) || user == null) {
-            setErrorMessage('No user context available. If not logged in please log in 123. ');
+            setErrorMessage('No user context available. If not logged in please log in.');
             return; 
           }
           const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/friend/getbyuserid/${user.id}`, {
@@ -57,7 +62,7 @@ const FriendsList: React.FC = () => {
     try {
       const jwtToken = await AsyncStorage.getItem('jwtToken');
       
-      if(userContext) {
+      if (userContext) {
         const { user } = userContext;
 
         if (isEmptyObject(user) || user == null) {
@@ -130,15 +135,3 @@ const styles = StyleSheet.create({
 });
 
 export default FriendsList;
-
-
-
-// const FriendsList: React.FC = () => {
-//   return (
-//     <View>
-//       <Text>Test: FriendsList component is rendering</Text>
-//     </View>
-//   );
-// };
-
-// export default FriendsList;
