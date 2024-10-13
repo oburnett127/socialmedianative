@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { UserContext } from './UserContext';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface FormData {
   email: string;
@@ -13,7 +13,7 @@ interface FormData {
 }
 
 const AuthForm: React.FC = () => {
-  const navigation = useNavigation();
+  //const navigation = useNavigation();
   const userContext = useContext(UserContext);
   if (!userContext) throw new Error("AuthForm must be used within a provider that provides UserContext");
   
@@ -31,16 +31,27 @@ const AuthForm: React.FC = () => {
     try {
       setMessage('');
 
+      //await AsyncStorage.clear();
+
+      // const authData = {
+      //   email: data.email,
+      //   password: data.password,
+      //   firstName: data.firstName,
+      //   lastName: data.lastName
+      // };
+
       const authData = {
         email: data.email,
-        password: data.password,
-        firstName: data.firstName,
-        lastName: data.lastName
+        password: data.password
       };
 
-      let url = isLogin === 'login'
-        ? `${process.env.REACT_APP_SERVER_URL}/userinfo/login`
-        : `${process.env.REACT_APP_SERVER_URL}/userinfo/signup`;
+      let url = 'http://192.168.0.152:3000/userinfo/login';
+      // let url = isLogin === 'login'
+      //   ? `${process.env.REACT_APP_SERVER_URL}/userinfo/login`
+      //   : `${process.env.REACT_APP_SERVER_URL}/userinfo/signup`;
+
+      console.log("authform: before login or signup");
+
 
       const response = await fetch(url, {
         method: 'POST',
@@ -60,13 +71,20 @@ const AuthForm: React.FC = () => {
         throw new Error('Could not authenticate user.');
       }
 
+      console.log("authform before response.json()");
+
       const resData = await response.json();
+
+      console.log("before jwtToken");
+      console.log("resData.token is, ", resData.token);
       const jwtToken = resData.token;
 
       await AsyncStorage.setItem('jwtToken', jwtToken);
       const expiration = new Date();
       expiration.setHours(expiration.getHours() + 2);
       await AsyncStorage.setItem('expiration', expiration.toISOString());
+
+      console.log("authform login or sign up successful");
 
       setMessage('Log in or sign up was successful');
       setIsLoggedIn(true);
@@ -79,6 +97,9 @@ const AuthForm: React.FC = () => {
           }
         });
         const user = await response.json();
+
+        console.log("setting user in authform: ", user);
+
         setUser(user);
       } catch (error: any) {
         console.error('Error fetching user:', error);

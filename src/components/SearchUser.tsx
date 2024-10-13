@@ -20,7 +20,6 @@ type SearchUserNavigationProp = CompositeNavigationProp<
 >;
 
 function SearchUser() {
-  // Update navigation hook to use the composite navigation type
   const navigation = useNavigation<SearchUserNavigationProp>();
 
   const [searchQuery, setSearchQuery] = useState('');

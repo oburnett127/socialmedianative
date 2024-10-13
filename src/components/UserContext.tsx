@@ -17,7 +17,7 @@ interface UserContextProps {
   setIsLoggedIn: (isLoggedIn: boolean) => void;
 }
 
-export const UserContext = React.createContext<UserContextProps | undefined>(undefined);
+export const UserContext = React.createContext<UserContextProps | null>(null);
 
 interface UserProviderProps {
   children: ReactNode;

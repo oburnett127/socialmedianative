@@ -27,27 +27,31 @@ const FriendsList: React.FC = () => {
   const navigation = useNavigation<FriendsListNavigationProp>();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  console.debug("456");
+  console.log("userContext in FriendsList: ", userContext);
+  console.log("userContext.user in FriendsList: ", userContext?.user);
 
   useEffect(() => {
+    if (!userContext || !userContext.user || Object.keys(userContext.user).length === 0) {
+      setErrorMessage('No user context available. If not logged in please log in.');
+      return;
+    }
+    
     const fetchData = async () => {
       try {
         const jwtToken = await AsyncStorage.getItem('jwtToken');
+        if (!jwtToken) {
+          setErrorMessage('JWT token is not available. Please log in.');
+          return;
+        }
+        const { user } = userContext;
         
-        if (userContext) {
-          const { user } = userContext;
-       
-          if (isEmptyObject(user) || user == null) {
-            setErrorMessage('No user context available. If not logged in please log in.');
-            return; 
-          }
+        if(user && typeof user === 'object' && Object.keys(user).length > 0) {
           const response = await axios.get(`${process.env.REACT_APP_SERVER_URL}/friend/getbyuserid/${user.id}`, {
             headers: {
               Authorization: `Bearer ${jwtToken}`,
               'Content-Type': 'application/json',
             },
           });
-          
           setFriendsData(response.data);
         }
       } catch (error) {
@@ -61,14 +65,19 @@ const FriendsList: React.FC = () => {
   const removeFriend = async (friendId: number) => {
     try {
       const jwtToken = await AsyncStorage.getItem('jwtToken');
-      
-      if (userContext) {
-        const { user } = userContext;
+      if (!jwtToken) {
+        setErrorMessage('JWT token is not available. Please log in.');
+        return;
+      }
 
-        if (isEmptyObject(user) || user == null) {
-          setErrorMessage('No user context available. If not logged in please log in.');
-          return; 
-        }
+      if (!userContext || !userContext.user || Object.keys(userContext.user).length === 0) {
+        setErrorMessage('No user context available. If not logged in please log in.');
+        return;
+      }
+
+      const { user } = userContext;
+
+      if(user && typeof user === 'object' && Object.keys(user).length > 0) {
         await axios.post(
           `${process.env.REACT_APP_SERVER_URL}/friend/delete`,
           { userId1: user.id, userId2: friendId },
